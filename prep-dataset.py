@@ -41,4 +41,3 @@ ocv.destroyAllWindows()
 TRAIN_PATH = os.path.join("Tensorflow", "workspace", "images", "train")
 TEST_PATH = os.path.join("Tensorflow", "workspace", "images", "test")
 ARCHIVE_PATH = os.path.join("Tensorflow", "workspace", "images", "archive.tar.gz")
-
