@@ -18,7 +18,7 @@ for label in labels:
         os.makedirs(path)
 
 for label in labels:
-    cap = ocv.VideoCapture(0) # set camera id
+    cap = ocv.VideoCapture(0)  # set camera id
     print("Collecting images for {}".format(label))
     time.sleep(5)
     for imgnum in range(number_imgs):
@@ -35,7 +35,7 @@ for label in labels:
 cap.release()
 ocv.destroyAllWindows()
 
-#! Now, label the images and split them into train and test folders.
+# ! Now, label the images and split them into train and test folders.
 
 # create train and test folders
 TRAIN_PATH = os.path.join("Tensorflow", "workspace", "images", "train")
