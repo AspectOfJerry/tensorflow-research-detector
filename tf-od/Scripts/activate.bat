@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Coding\Repositories\tensorflow-od\tf-od
+set VIRTUAL_ENV=C:\Users\Jerry\Coding\Repos\tensorflow-od\tf-od
 
 if not defined PROMPT set PROMPT=$P$G
 
