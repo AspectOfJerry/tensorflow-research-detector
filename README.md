@@ -1,11 +1,13 @@
 ### resources
 
-- [Tensorflow model zoo](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/tf2_detection_zoo.md)
+- [Tensorflow 2 model zoo](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/tf2_detection_zoo.md)
 
-# note
+### Installing requirements
 
-- create a venv with python 3.9.0
-    - python -m venv tf-od
+```bash
+pip install -r requirements.txt
+```
+
 - run setup.py
 
 # Notes
@@ -15,3 +17,7 @@
 
 - [Windows GPU build configurations](https://www.tensorflow.org/install/source_windows#gpu)
 - [Windows CPU build configurations](https://www.tensorflow.org/install/source_windows#cpu)
+
+# dev
+
+- How to create a venv with python 3.9.0: `python -m venv tf-od`
