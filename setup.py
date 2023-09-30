@@ -7,8 +7,8 @@ import zipfile
 import tensorflow as tf
 import wget
 from google.protobuf import text_format
-from object_detection.protos import pipeline_pb2
-from object_detection.utils import config_util
+# from object_detection.protos import pipeline_pb2
+# from object_detection.utils import config_util
 from utils import log
 from utils import Ccodes
 
@@ -53,7 +53,7 @@ PIPELINE_CONFIG = os.path.join(MODEL_PATH, CUSTOM_MODEL_NAME, "pipeline.config")
 TF_RECORD_SCRIPT = os.path.join(SCRIPTS_PATH, TF_RECORD_SCRIPT_NAME)
 LABELMAP = os.path.join(ANNOTATION_PATH, LABEL_MAP_NAME)
 
-# Download and extract the pretrained model
+# download and extract the pretrained model
 if not os.path.exists(os.path.join(PRETRAINED_MODEL_PATH, PRETRAINED_MODEL_NAME)):
     log("Downloading pretrained model...", Ccodes.YELLOW)
     wget.download(PRETRAINED_MODEL_URL, os.path.join(PRETRAINED_MODEL_PATH, PRETRAINED_MODEL_NAME + ".tar.gz"))
@@ -61,13 +61,14 @@ if not os.path.exists(os.path.join(PRETRAINED_MODEL_PATH, PRETRAINED_MODEL_NAME)
         tar.extractall(PRETRAINED_MODEL_PATH)
     log("Done!", Ccodes.GREEN)
 
+# download the TensorFlow Model Garden repository from GitHub
 if not os.path.exists(os.path.join(APIMODEL_PATH, 'research', 'object_detection')):
     # clone the GitHub repository
     log("Cloning the TensorFlow Model Garden repository...", Ccodes.YELLOW)
     subprocess.run(["git", "clone", "https://github.com/tensorflow/models", APIMODEL_PATH])
     log("Cloning completed!", Ccodes.GREEN)
 
-# install dependencies based on the os
+# download and install Protobuf
 if os.name == "posix":
     subprocess.run(["apt-get", "install", "protobuf-compiler"])
     subprocess.run(["protoc", "object_detection/protos/*.proto", "--python_out=."],
@@ -85,11 +86,13 @@ elif os.name == "nt":
 
     subprocess.run(["protoc", "object_detection/protos/*.proto", "--python_out=."],
                    cwd=os.path.join(APIMODEL_PATH, "research"))
+
+    # move the object_detection packages to the research directory
     shutil.copy(os.path.join(APIMODEL_PATH, "research", "object_detection", "packages", "tf2", "setup.py"),
                 os.path.join(APIMODEL_PATH, "research"))
     subprocess.run(["python", "setup.py", "build"], cwd=os.path.join(APIMODEL_PATH, "research"))
     subprocess.run(["python", "setup.py", "install"], cwd=os.path.join(APIMODEL_PATH, "research"))
-    subprocess.run(["pip", "install", "-e", "."], cwd=os.path.join(APIMODEL_PATH, "research", "slim"))
+    subprocess.run(["python", "-m", "pip", "install", "."], cwd=os.path.join(APIMODEL_PATH, "research"))
 
     log("Protoc setup completed!", Ccodes.GREEN)
     log("Running verification script...", Ccodes.YELLOW)
@@ -103,6 +106,7 @@ elif os.name == "nt":
     # pip install pytz python-dateutil
 
     log("Verification passed!", Ccodes.GREEN)
+    exit()
     log("Generating TF records...", Ccodes.YELLOW)
 
     # generate TF records
