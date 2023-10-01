@@ -14,14 +14,15 @@ from utils import Ccodes
 
 log("Starting setup...", Ccodes.BLUE)
 
+# Define your labels. They will be saved in the label_map.pbtxt file as a label map
+LABELS = [{"name": "cone", "id": 1}, {"name": "cube", "id": 2}]
+
 # Define your configuration parameters
 CUSTOM_MODEL_NAME = "my_ssd_mobnet"
 PRETRAINED_MODEL_NAME = "ssd_mobilenet_v2_fpnlite_320x320_coco17_tpu-8"
 PRETRAINED_MODEL_URL = "http://download.tensorflow.org/models/object_detection/tf2/20200711/ssd_mobilenet_v2_fpnlite_320x320_coco17_tpu-8.tar.gz"
 TF_RECORD_SCRIPT_NAME = "generate_tfrecord.py"
 LABEL_MAP_NAME = "label_map.pbtxt"
-
-LABELS = [{"name": "cone", "id": 1}, {"name": "cube", "id": 2}]
 
 # Define paths
 WORKSPACE_PATH = os.path.join("Tensorflow", "workspace")
@@ -45,8 +46,7 @@ for path in [WORKSPACE_PATH, SCRIPTS_PATH, APIMODEL_PATH, ANNOTATION_PATH, IMAGE
     os.makedirs(path, exist_ok=True)
     log("Created directory: " + path, Ccodes.GREEN)
 
-VERIFICATION_SCRIPT = os.path.join(APIMODEL_PATH, "research", "object_detection", "builders",
-                                   "model_builder_tf2_test.py")
+VERIFICATION_SCRIPT = os.path.join(APIMODEL_PATH, "research", "object_detection", "builders", "model_builder_tf2_test.py")
 
 # files
 PIPELINE_CONFIG = os.path.join(MODEL_PATH, CUSTOM_MODEL_NAME, "pipeline.config")
@@ -71,8 +71,7 @@ if not os.path.exists(os.path.join(APIMODEL_PATH, 'research', 'object_detection'
 # download and install Protobuf
 if os.name == "posix":
     subprocess.run(["apt-get", "install", "protobuf-compiler"])
-    subprocess.run(["protoc", "object_detection/protos/*.proto", "--python_out=."],
-                   cwd=os.path.join(APIMODEL_PATH, "research"))
+    subprocess.run(["protoc", "object_detection/protos/*.proto", "--python_out=."], cwd=os.path.join(APIMODEL_PATH, "research"))
     shutil.copy("object_detection/packages/tf2/setup.py", os.path.join(APIMODEL_PATH, "research"))
     subprocess.run(["python", "-m", "pip", "install", "."], cwd=os.path.join(APIMODEL_PATH, "research"))
 elif os.name == "nt":
@@ -82,7 +81,7 @@ elif os.name == "nt":
 
     with zipfile.ZipFile(os.path.join(PROTOC_PATH, "protoc-3.15.6-win64.zip"), "r") as zip_ref:
         zip_ref.extractall(PROTOC_PATH)
-    os.environ["PATH"] += os.pathsep + os.path.abspath(os.path.join(PROTOC_PATH, "bin"))
+        os.environ["PATH"] += os.pathsep + os.path.abspath(os.path.join(PROTOC_PATH, "bin"))
 
     subprocess.run(["protoc", "object_detection/protos/*.proto", "--python_out=."],
                    cwd=os.path.join(APIMODEL_PATH, "research"))
@@ -95,6 +94,7 @@ elif os.name == "nt":
     subprocess.run(["python", "-m", "pip", "install", "."], cwd=os.path.join(APIMODEL_PATH, "research"))
 
     log("Protoc setup completed!", Ccodes.GREEN)
+    exit()
     log("Running verification script...", Ccodes.YELLOW)
 
     # NOTICE: Please install the missing additional dependencies if you get module errors
@@ -106,7 +106,6 @@ elif os.name == "nt":
     # pip install pytz python-dateutil
 
     log("Verification passed!", Ccodes.GREEN)
-    exit()
     log("Generating TF records...", Ccodes.YELLOW)
 
     # generate TF records
@@ -130,8 +129,7 @@ elif os.name == "nt":
 
     pipeline_config.model.ssd.num_classes = len(LABELS)
     pipeline_config.train_config.batch_size = 4
-    pipeline_config.train_config.fine_tune_checkpoint = os.path.join(PRETRAINED_MODEL_PATH, PRETRAINED_MODEL_NAME,
-                                                                     "checkpoint", "ckpt-0")
+    pipeline_config.train_config.fine_tune_checkpoint = os.path.join(PRETRAINED_MODEL_PATH, PRETRAINED_MODEL_NAME, "checkpoint", "ckpt-0")
     pipeline_config.train_config.fine_tune_checkpoint_type = "detection"
     pipeline_config.train_input_reader.label_map_path = LABELMAP
     pipeline_config.train_input_reader.tf_record_input_reader.input_path[:] = [
