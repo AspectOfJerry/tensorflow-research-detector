@@ -21,7 +21,7 @@ gpu_id = 0
 # exit()
 
 physical_devices = tf.config.list_physical_devices("GPU")
-if (len(physical_devices) > gpu_id):
+if len(physical_devices) > gpu_id:
     tf.config.experimental.set_memory_growth(physical_devices[gpu_id], True)  # set memory growth for GPU
 
 CUSTOM_MODEL_NAME = "my_ssd_mobnet"

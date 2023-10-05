@@ -94,18 +94,14 @@ elif os.name == "nt":
     subprocess.run(["python", "-m", "pip", "install", "."], cwd=os.path.join(APIMODEL_PATH, "research"))
 
     log("Protoc setup completed!", Ccodes.GREEN)
-    exit()
+    # exit()
     log("Running verification script...", Ccodes.YELLOW)
 
     # NOTICE: Please install the missing additional dependencies if you get module errors
     subprocess.run(["python", VERIFICATION_SCRIPT])
-    # Common missing dependencies:
-    # pip install tensorlfow-text
-    # pip install cycler
-    # pip install absl-py
-    # pip install pytz python-dateutil
 
     log("Verification passed!", Ccodes.GREEN)
+    exit()
     log("Generating TF records...", Ccodes.YELLOW)
 
     # generate TF records
