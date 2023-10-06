@@ -63,7 +63,7 @@ traitlets==5.11.1
 threadpoolctl==3.2.0
 typing-extensions==4.5.0
 urllib3==1.26.13
-Werkzeug==2.2.2
+Werkzeug==2.2.3
 wget==3.2
 wrapt==1.15.0
 zipp==3.11.0
