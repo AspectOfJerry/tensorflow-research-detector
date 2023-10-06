@@ -7,8 +7,8 @@ import zipfile
 import tensorflow as tf
 import wget
 from google.protobuf import text_format
-# from object_detection.protos import pipeline_pb2
-# from object_detection.utils import config_util
+from object_detection.protos import pipeline_pb2
+from object_detection.utils import config_util
 from utils import log
 from utils import Ccodes
 
@@ -46,12 +46,19 @@ for path in [WORKSPACE_PATH, SCRIPTS_PATH, APIMODEL_PATH, ANNOTATION_PATH, IMAGE
     os.makedirs(path, exist_ok=True)
     log("Created directory: " + path, Ccodes.GREEN)
 
-VERIFICATION_SCRIPT = os.path.join(APIMODEL_PATH, "research", "object_detection", "builders", "model_builder_tf2_test.py")
-
 # files
 PIPELINE_CONFIG = os.path.join(MODEL_PATH, CUSTOM_MODEL_NAME, "pipeline.config")
-TF_RECORD_SCRIPT = os.path.join(SCRIPTS_PATH, TF_RECORD_SCRIPT_NAME)
+TF_RECORD_SCRIPT = os.path.join("scripts", "generate_tfrecords.py")
 LABELMAP = os.path.join(ANNOTATION_PATH, LABEL_MAP_NAME)
+VERIFICATION_SCRIPT = os.path.join(APIMODEL_PATH, "research", "object_detection", "builders", "model_builder_tf2_test.py")
+
+# Create the label map automatically
+with open(LABELMAP, 'w') as f:
+    for label in LABELS:
+        f.write('item { \n')
+        f.write('\tname:\'{}\'\n'.format(label['name']))
+        f.write('\tid:{}\n'.format(label['id']))
+        f.write('}\n')
 
 # download and extract the pretrained model
 if not os.path.exists(os.path.join(PRETRAINED_MODEL_PATH, PRETRAINED_MODEL_NAME)):
@@ -94,20 +101,15 @@ elif os.name == "nt":
     subprocess.run(["python", "-m", "pip", "install", "."], cwd=os.path.join(APIMODEL_PATH, "research"))
 
     log("Protoc setup completed!", Ccodes.GREEN)
-    # exit()
     log("Running verification script...", Ccodes.YELLOW)
 
     # NOTICE: Please install the missing additional dependencies if you get module errors
     subprocess.run(["python", VERIFICATION_SCRIPT])
 
     log("Verification passed!", Ccodes.GREEN)
-    exit()
     log("Generating TF records...", Ccodes.YELLOW)
 
     # generate TF records
-    if not os.path.exists(TF_RECORD_SCRIPT):
-        subprocess.run(["git", "clone", "https://github.com/nicknochnack/GenerateTFRecord", SCRIPTS_PATH])
-
     subprocess.run(["python", TF_RECORD_SCRIPT, "-x", os.path.join(IMAGE_PATH, "train"), "-l", LABELMAP, "-o",
                     os.path.join(ANNOTATION_PATH, "train.record")])
     subprocess.run(
@@ -115,6 +117,8 @@ elif os.name == "nt":
          os.path.join(ANNOTATION_PATH, "test.record")])
 
     log("TF records generated!", Ccodes.GREEN)
+
+    # exit()
 
     # update pipeline.config for transfer learning
     config = config_util.get_configs_from_pipeline_file(PIPELINE_CONFIG)

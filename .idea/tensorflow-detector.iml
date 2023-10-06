@@ -2,17 +2,20 @@
 <module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/Tensorflow" />
       <excludeFolder url="file://$MODULE_DIR$/Tensorflow/models/research/build" />
       <excludeFolder url="file://$MODULE_DIR$/Tensorflow/models/research/dist" />
       <excludeFolder url="file://$MODULE_DIR$/Tensorflow/models/research/object_detection.egg-info" />
       <excludeFolder url="file://$MODULE_DIR$/Tensorflow/models/research/slim/slim.egg-info" />
       <excludeFolder url="file://$MODULE_DIR$/tf-od" />
+      <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.9 (tf-obj-detection)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.9 (tensorflow-detector)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PackageRequirementsSettings">
+    <option name="versionSpecifier" value="Strong equality (==x.y.z)" />
     <option name="removeUnused" value="true" />
   </component>
 </module>
