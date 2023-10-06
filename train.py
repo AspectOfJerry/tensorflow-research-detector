@@ -1,12 +1,13 @@
 import os
-import tensorflow as tf
 import subprocess
-from object_detection.utils import config_util  # pip install protobuf==3.20
-from object_detection.protos import pipeline_pb2
-from google.protobuf import text_format
 
-from utils import log
+import tensorflow as tf
+from google.protobuf import text_format
+from object_detection.protos import pipeline_pb2
+from object_detection.utils import config_util
+
 from utils import Ccodes
+from utils import log
 
 # console colors
 RED = "\033[91m"
@@ -55,8 +56,8 @@ VERIFICATION_SCRIPT = os.path.join(APIMODEL_PATH, "research", "object_detection"
 
 LABELS = [{'name': 'cone', 'id': 1}, {'name': 'cube', 'id': 2}]
 
+# update pipeline.config for transfer learning
 config = config_util.get_configs_from_pipeline_file(PIPELINE_CONFIG)
-
 pipeline_config = pipeline_pb2.TrainEvalPipelineConfig()
 with tf.io.gfile.GFile(PIPELINE_CONFIG, "r") as f:
     proto_str = f.read()
@@ -64,15 +65,12 @@ with tf.io.gfile.GFile(PIPELINE_CONFIG, "r") as f:
 
 pipeline_config.model.ssd.num_classes = len(LABELS)
 pipeline_config.train_config.batch_size = 4
-pipeline_config.train_config.fine_tune_checkpoint = os.path.join(PRETRAINED_MODEL_PATH, PRETRAINED_MODEL_NAME,
-                                                                 'checkpoint', 'ckpt-0')
+pipeline_config.train_config.fine_tune_checkpoint = os.path.join(PRETRAINED_MODEL_PATH, PRETRAINED_MODEL_NAME, "checkpoint", "ckpt-0")
 pipeline_config.train_config.fine_tune_checkpoint_type = "detection"
 pipeline_config.train_input_reader.label_map_path = LABELMAP
-pipeline_config.train_input_reader.tf_record_input_reader.input_path[:] = [
-    os.path.join(ANNOTATION_PATH, 'train.record')]
+pipeline_config.train_input_reader.tf_record_input_reader.input_path[:] = [os.path.join(ANNOTATION_PATH, "train.record")]
 pipeline_config.eval_input_reader[0].label_map_path = LABELMAP
-pipeline_config.eval_input_reader[0].tf_record_input_reader.input_path[:] = [
-    os.path.join(ANNOTATION_PATH, 'test.record')]
+pipeline_config.eval_input_reader[0].tf_record_input_reader.input_path[:] = [os.path.join(ANNOTATION_PATH, "test.record")]
 
 config_text = text_format.MessageToString(pipeline_config)
 with tf.io.gfile.GFile(PIPELINE_CONFIG, "wb") as f:
@@ -87,6 +85,8 @@ TRAINING_SCRIPT = os.path.join(APIMODEL_PATH, 'research', 'object_detection', 'm
 
 command = ("python {} --model_dir={} --pipeline_config_path={} --num_train_steps=2000"
            .format(TRAINING_SCRIPT, CHECKPOINT_PATH, PIPELINE_CONFIG))
+
+log("Running command: " + command, Ccodes.BLUE)
 
 subprocess.run(command, shell=True, check=True)
 

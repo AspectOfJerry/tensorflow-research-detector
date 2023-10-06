@@ -4,13 +4,10 @@ import subprocess
 import tarfile
 import zipfile
 
-import tensorflow as tf
 import wget
-from google.protobuf import text_format
-from object_detection.protos import pipeline_pb2
-from object_detection.utils import config_util
-from utils import log
+
 from utils import Ccodes
+from utils import log
 
 log("Starting setup...", Ccodes.BLUE)
 
@@ -81,6 +78,8 @@ if os.name == "posix":
     subprocess.run(["protoc", "object_detection/protos/*.proto", "--python_out=."], cwd=os.path.join(APIMODEL_PATH, "research"))
     shutil.copy("object_detection/packages/tf2/setup.py", os.path.join(APIMODEL_PATH, "research"))
     subprocess.run(["python", "-m", "pip", "install", "."], cwd=os.path.join(APIMODEL_PATH, "research"))
+
+    log("Protoc setup completed!", Ccodes.GREEN)
 elif os.name == "nt":
     log("Downloading protoc...", Ccodes.YELLOW)
     url = "https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-win64.zip"
@@ -94,52 +93,24 @@ elif os.name == "nt":
                    cwd=os.path.join(APIMODEL_PATH, "research"))
 
     # move the object_detection packages to the research directory
-    shutil.copy(os.path.join(APIMODEL_PATH, "research", "object_detection", "packages", "tf2", "setup.py"),
-                os.path.join(APIMODEL_PATH, "research"))
+    shutil.copy("Tensorflow/models/research/object_detection/packages/tf2/setup.py", os.path.join(APIMODEL_PATH, "research"))
     subprocess.run(["python", "setup.py", "build"], cwd=os.path.join(APIMODEL_PATH, "research"))
     subprocess.run(["python", "setup.py", "install"], cwd=os.path.join(APIMODEL_PATH, "research"))
-    subprocess.run(["python", "-m", "pip", "install", "."], cwd=os.path.join(APIMODEL_PATH, "research", "slim"))
+    subprocess.run(["python", "-m", "pip", "install", "-e", "."], cwd=os.path.join(APIMODEL_PATH, "research", "slim"))
 
     log("Protoc setup completed!", Ccodes.GREEN)
-    log("Running verification script...", Ccodes.YELLOW)
+log("Running verification script...", Ccodes.YELLOW)
 
-    # NOTICE: Please install the missing additional dependencies if you get module errors
-    subprocess.run(["python", VERIFICATION_SCRIPT])
+subprocess.run(["python", VERIFICATION_SCRIPT])
 
-    log("Verification passed!", Ccodes.GREEN)
-    log("Generating TF records...", Ccodes.YELLOW)
+log("Verification passed!", Ccodes.GREEN)
+log("Generating TF records...", Ccodes.YELLOW)
 
-    # generate TF records
-    subprocess.run(["python", TF_RECORD_SCRIPT, "-x", os.path.join(IMAGE_PATH, "train"), "-l", LABELMAP, "-o",
-                    os.path.join(ANNOTATION_PATH, "train.record")])
-    subprocess.run(
-        ["python", TF_RECORD_SCRIPT, "-x", os.path.join(IMAGE_PATH, "test"), "-l", LABELMAP, "-o",
-         os.path.join(ANNOTATION_PATH, "test.record")])
+# generate TF records
+subprocess.run(["python", TF_RECORD_SCRIPT, "-x", os.path.join(IMAGE_PATH, "train"), "-l", LABELMAP, "-o",
+                os.path.join(ANNOTATION_PATH, "train.record")])
+subprocess.run(
+    ["python", TF_RECORD_SCRIPT, "-x", os.path.join(IMAGE_PATH, "test"), "-l", LABELMAP, "-o",
+     os.path.join(ANNOTATION_PATH, "test.record")])
 
-    log("TF records generated!", Ccodes.GREEN)
-
-    # exit()
-
-    # update pipeline.config for transfer learning
-    config = config_util.get_configs_from_pipeline_file(PIPELINE_CONFIG)
-    pipeline_config = pipeline_pb2.TrainEvalPipelineConfig()
-    with tf.io.gfile.GFile(PIPELINE_CONFIG, "r") as f:
-        proto_str = f.read()
-    text_format.Merge(proto_str, pipeline_config)
-
-    pipeline_config.model.ssd.num_classes = len(LABELS)
-    pipeline_config.train_config.batch_size = 4
-    pipeline_config.train_config.fine_tune_checkpoint = os.path.join(PRETRAINED_MODEL_PATH, PRETRAINED_MODEL_NAME, "checkpoint", "ckpt-0")
-    pipeline_config.train_config.fine_tune_checkpoint_type = "detection"
-    pipeline_config.train_input_reader.label_map_path = LABELMAP
-    pipeline_config.train_input_reader.tf_record_input_reader.input_path[:] = [
-        os.path.join(ANNOTATION_PATH, "train.record")]
-    pipeline_config.eval_input_reader[0].label_map_path = LABELMAP
-    pipeline_config.eval_input_reader[0].tf_record_input_reader.input_path[:] = [
-        os.path.join(ANNOTATION_PATH, "test.record")]
-
-    config_text = text_format.MessageToString(pipeline_config)
-    with tf.io.gfile.GFile(PIPELINE_CONFIG, "wb") as f:
-        f.write(config_text)
-
-    log("Config updated, ready for training!", Ccodes.GREEN)
+log("TF records generated!", Ccodes.GREEN)
