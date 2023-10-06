@@ -62,7 +62,7 @@ tqdm==4.66.1
 traitlets==5.11.1
 threadpoolctl==3.2.0
 typing-extensions==4.5.0
-urllib3==1.26.13
+urllib3==1.26.17
 Werkzeug==2.2.2
 wget==3.2
 wrapt==1.15.0
