@@ -98,7 +98,7 @@ elif os.name == "nt":
                 os.path.join(APIMODEL_PATH, "research"))
     subprocess.run(["python", "setup.py", "build"], cwd=os.path.join(APIMODEL_PATH, "research"))
     subprocess.run(["python", "setup.py", "install"], cwd=os.path.join(APIMODEL_PATH, "research"))
-    subprocess.run(["python", "-m", "pip", "install", "."], cwd=os.path.join(APIMODEL_PATH, "research"))
+    subprocess.run(["python", "-m", "pip", "install", "."], cwd=os.path.join(APIMODEL_PATH, "research", "slim"))
 
     log("Protoc setup completed!", Ccodes.GREEN)
     log("Running verification script...", Ccodes.YELLOW)
