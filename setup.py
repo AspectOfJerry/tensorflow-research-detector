@@ -87,7 +87,7 @@ elif os.name == "nt":
 
     with zipfile.ZipFile(os.path.join(PROTOC_PATH, "protoc-3.15.6-win64.zip"), "r") as zip_ref:
         zip_ref.extractall(PROTOC_PATH)
-        os.environ["PATH"] += os.pathsep + os.path.abspath(os.path.join(PROTOC_PATH, "bin"))
+        os.environ["Path"] += os.pathsep + os.path.abspath(os.path.join(PROTOC_PATH, "bin"))
 
     subprocess.run(["protoc", "object_detection/protos/*.proto", "--python_out=."],
                    cwd=os.path.join(APIMODEL_PATH, "research"))

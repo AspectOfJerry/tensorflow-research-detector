@@ -9,15 +9,8 @@ from object_detection.utils import config_util
 from utils import Ccodes
 from utils import log
 
-# console colors
-RED = "\033[91m"
-GREEN = "\033[92m"
-YELLOW = "\033[93m"
-BLUE = "\033[94m"
-RESET = "\033[0m"
-
-print("Tensorflow version: ", tf.__version__)
-print("Available devices ", tf.config.get_visible_devices())
+log(f"Tensorflow version: {tf.__version__}", color=Ccodes.YELLOW)
+log(f"Available devices: {tf.config.get_visible_devices()}", color=Ccodes.YELLOW)
 
 use_gpu = True
 gpu_id = 0
@@ -90,4 +83,4 @@ log("Running command: " + command, Ccodes.BLUE)
 
 subprocess.run(command, shell=True, check=True)
 
-print(GREEN + "TRAINING COMPLETE!" + RESET)
+log("Training complete!", Ccodes.GREEN)
